@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Customers List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th>No</th>
+						<th data-hide="phone">First Name</th>
+						<th data-hide="phone">Last Name</th>
+						<th data-toggle="true">Email</th>
+						<th data-hide="phone">Phone</th>
+						<!-- <th data-hide="phone,tablet">Address</th>
+						<th data-hide="phone,tablet">Birthday</th> -->
+						<th data-hide="phone">Status</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="customer, customerStatus : ${customers}">
+						<td th:text="${customerStatus.count}"></td>
+						<td th:text="${customer.firstName}"></td>
+						<td th:text="${customer.lastName}"></td>
+						<td th:text="${customer.email}"></td>
+						<td th:text="${customer.phone}"></td>
+						<!-- <td th:text="${customer.address.addressLine1 + ', ' + customer.address.city + ', ' + customer.address.state}"></td>
+						<td th:text="${customer.birthDay}"></td> -->
+						<td th:text="${customer.status}"></td>
+						<td class="">
+							<ul class="list list-inline no-margin">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">
+										<i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" data-target="#edit_modal"><i class="icon-pencil7"></i>Edit</a></li>
+										<li><a href="#" data-toggle="modal" data-target="#remove_modal"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- /row toggler -->
+	</div>
+</body>
+</html>

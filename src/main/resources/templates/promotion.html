@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/web/thymeleaf/layout"
+	layout:decorator="layout">
+<head>
+	<script type="text/javascript" th:src="${resources_path} + '/js/app/promotion.js'"></script>
+</head>
+<body>
+	<div layout:fragment="content">
+		<!-- Adding service form -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Add Promotion</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+					</ul>
+				</div>
+			</div>
+			<form id="addPromotionFrmId" class="form-horizontal">
+				<div th:replace="fragments/fragments :: form_error_2"></div>
+				<div th:replace="fragments/fragments :: form_success_2"></div>
+				<div class="panel-body">
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Code: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<input type="text" id="codeAddIptId" class="form-control" required="required" placeholder="Code" style="text-transform:uppercase"/>
+						</div>
+					</div>
+					<div th:each="valueType, valueTypeStatus: ${valueTypes}">
+						<div class="form-group">
+							<label class="col-lg-3 control-label">Value Type: </label>
+							<div class="col-lg-4">
+								<select th:id="valueTypeAddSltId + ${valueTypeStatus.count}" class="select">
+									<option selected="selected" th:value="${valueType.value}" th:text="${valueType.name}"></option>
+								</select>
+							</div>
+							
+							<label class="col-lg-1 control-label">Value: </label>
+							<div class="col-lg-4">
+								<input type="number" th:id="valueAddIptId + ${valueTypeStatus.count}" step="any" class="form-control" placeholder="Value" />
+							</div>
+						</div>
+					</div>
+					
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Use for: <span class="text-danger">(*)</span></label>
+						<div class="col-lg-9">
+							<select id="useForAddSltId" class="select" required="required" data-placeholder="Select an item">
+								<option selected="selected" disabled="disabled" value="">Select an item</option>
+								<option th:each="useFor: ${useFors}" th:value="${useFor.value}" th:text="${useFor.name}"></option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label class="col-lg-3 control-label">Is Active: </label>
+						<div class="col-lg-9">
+							<div class="checkbox checkbox-switch">
+								<input type="checkbox" id="activeAddIptId" class="switch" data-on-text="On" 
+									data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+							</div>
+						</div>
+					</div>
+					
+					<div class="text-right">
+						<button type="submit" id="addPromotionBtnId" class="btn bg-pink-400"> Add<i class="icon-circle-right2 position-right"></i></button>
+					</div>
+				</div>
+			</form>
+		</div>
+
+		<!-- Row toggler -->
+		<div class="panel panel-flat">
+			<div class="panel-heading">
+				<h5 class="panel-title">Promotion List</h5>
+				<div class="heading-elements">
+					<ul class="icons-list">
+						<li><a data-action="collapse"></a></li>
+						<li><a data-action="reload"></a></li>
+						<!-- <li><a data-action="close"></a></li> -->
+					</ul>
+				</div>
+			</div>
+			<table class="table table-togglable datatable-header-offset">
+				<thead>
+					<tr>
+						<th>No</th>
+						<th data-toggle="true">Code</th>
+						<th data-hide="phone">Values</th>
+						<th data-hide="phone">Use For</th>
+						<th data-hide="phone">Status</th>
+						<th data-hide="phone">Update</th>
+						<th class="text-center" style="width: 30px;"><i
+							class="icon-menu-open2"></i></th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="promotion, promotionStatus : ${promotions}">
+						<td th:text="${promotionStatus.count}"></td>
+						<td th:text="${promotion.code}"></td>
+						<td>
+							<div th:each="value: ${promotion.values}">
+								<span th:text="${value.valueTypeObject.name}"></span>:
+								<span th:text=" ${value.value}" class="text-primary-600"></span>
+							</div>
+						</td>
+						<td th:text="${promotion.useFor.name}"></td>
+						<td th:text="${promotion.active ? 'Active' : 'Inactive'}"
+							th:class="${promotion.active ? 'text-primary-600' : 'text-danger-600'}"></td>
+						<td th:text="${promotion.updatedDate}"></td>
+						<td class="">
+							<ul class="list list-inline no-margin">
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle"
+										data-toggle="dropdown"> <i class="icon-cog7"></i>
+									</a>
+
+									<ul class="dropdown-menu dropdown-menu-right">
+										<li><a href="#" data-toggle="modal" th:onclick="'openPromotionEditModal(\''+${promotion.id}+'\')'"><i class="icon-pencil7"></i>Edit</a></li>
+										<li><a href="#" data-toggle="modal" th:onclick="'openPromotionDeleteModal(\''+${promotion.id}+'\')'"><i class="icon-trash"></i>Delete</a></li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+		<!-- /row toggler -->
+		<!-- Edit Modal -->
+		<div id="editPromotionMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Edit Promotion</h5>
+					</div>
+					<div class="modal-body">
+						<form id="editPromotionFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div class="panel-body">
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Code: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<input type="text" id="codeEditIptId" class="form-control" required="required" placeholder="Code" style="text-transform:uppercase"/>
+									</div>
+								</div>
+								
+								<div th:each="valueType, valueTypeStatus: ${valueTypes}">
+									<div class="form-group">
+										<label class="col-lg-3 control-label">Value Type: </label>
+										<div class="col-lg-4">
+											<select th:id="valueTypeEditSltId + ${valueTypeStatus.count}" class="select">
+												<option selected="selected" th:value="${valueType.value}" th:text="${valueType.name}"></option>
+											</select>
+										</div>
+										
+										<label class="col-lg-1 control-label">Value: </label>
+										<div class="col-lg-4">
+											<input type="number" th:id="valueEditIptId + ${valueTypeStatus.count}" step="any" class="form-control" placeholder="Value" />
+										</div>
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Use for: <span class="text-danger">(*)</span></label>
+									<div class="col-lg-9">
+										<select id="useForEditSltId" class="select" required="required" data-placeholder="Select an item">
+											<option selected="selected" disabled="disabled" value="">Select an item</option>
+											<option th:each="useFor: ${useFors}" th:value="${useFor.value}" th:text="${useFor.name}"></option>
+										</select>
+									</div>
+								</div>
+			
+								<div class="form-group">
+									<label class="col-lg-3 control-label">Is Active: </label>
+									<div class="col-lg-9">
+										<div class="checkbox checkbox-switch">
+											<input type="checkbox" id="activeEditIptId" data-on-text="On" 
+												data-off-text="Off" data-on-color="primary" data-off-color="default" checked="checked"/>
+										</div>
+									</div>
+								</div>
+								<input type="hidden" id="idEditIptId" />
+								<button type="submit" id="editPromotionBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitPromotionEdit()">Save changes</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Edit Modal -->
+		
+		<!-- Delete Modal -->
+		<div id="deletePromotionMdlId" class="modal fade" role="dialog">
+			<div class="modal-dialog modal-lg">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal">&times;</button>
+						<h5 class="modal-title">Delete Promotion</h5>
+					</div>
+					<div class="modal-body">
+						<form id="deletePromotionFrmId" class="form-horizontal">
+							<div th:replace="fragments/fragments :: form_error_2"></div>
+							<div th:replace="fragments/fragments :: form_success_2"></div>
+							<div th:replace="fragments/fragments :: form_warning_2"></div>
+							<div class="panel-body">
+								<input type="hidden" id="idDeleteIptId" />
+								<button type="submit" id="deletePromotionBtnId" class="btn bg-pink-400" style="display:none"> Add<i class="icon-circle-right2 position-right"></i></button>
+							</div>
+						</form>
+					</div>
+
+					<div class="modal-footer">
+						<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-primary" onclick="submitPromotionDelete()">Delete</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- /Delete Modal -->
+	</div>
+</body>
+</html>
